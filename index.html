@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Rotas e combustível</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0d0d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#0d0d0d;--card:#1a1a1a;--card2:#252525;--ink:#fff;--mute:#8c8c8c;--teal:#7be0d0;--gold:#ff8a00;--coral:#ff5a5f;--acc:#ff8a00;--ok:#6ee7a0;--okbg:rgba(110,231,160,.14);--bad:#ff7a7a;--badbg:rgba(255,90,95,.16);--line:#2c2c2c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(120% 340px at 50% 0,rgba(255,138,0,.22),transparent 70%) no-repeat,var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:430px;margin:0 auto;min-height:100dvh;padding:14px 16px 0;display:flex;flex-direction:column}
+[hidden]{display:none!important}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.hd{display:flex;align-items:flex-end;gap:10px;margin:4px 0 22px}
+.logo{font-size:24px;font-weight:900;-webkit-text-stroke:.7px #fff;white-space:nowrap;line-height:1;padding-bottom:4px}
+.logo b{color:#ff5a2e;-webkit-text-stroke:.7px #ff5a2e}
+.road{position:relative;flex:1;height:34px;margin-right:-16px;overflow:hidden;border-bottom:2px dashed #444}
+.car{position:absolute;bottom:2px;left:0;width:48px;height:24px;z-index:2;animation:drive 10s linear infinite}
+.car circle{fill:#3a3a3a;stroke:#9a9a9a}
+.casa{position:absolute;right:0;bottom:2px;width:30px;height:30px}
+.box{position:absolute;bottom:2px;left:calc(100% - 50px);width:18px;height:16px;opacity:0;animation:drop 10s linear infinite}
+.wh{transform-box:fill-box;transform-origin:center;animation:spin .6s linear infinite}
+@keyframes drive{0%{left:0;transform:scaleX(1)}45%,49.9%{left:calc(100% - 102px);transform:scaleX(1)}50%{left:calc(100% - 102px);transform:scaleX(-1)}95%,100%{left:0;transform:scaleX(-1)}}
+@keyframes drop{0%,45%{opacity:0;transform:translateY(-14px)}47%{opacity:1;transform:translateY(0)}48.5%{transform:translateY(-4px)}50%,92%{opacity:1;transform:translateY(0)}97%,100%{opacity:0;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.car,.box,.wh{animation:none}.car{left:calc(100% - 102px)}.box{opacity:1}}
+.range{display:flex;justify-content:space-between;align-items:center}
+h1,h2{margin:0;font-weight:700}
+h1{font-size:22px}
+h2{font-size:18px}
+.sel select{appearance:none;-webkit-appearance:none;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center;border:0;border-radius:999px;padding:9px 38px 9px 16px;color:var(--ink);font-size:15px}
+.sub{margin:6px 0 14px;color:var(--mute);font-size:14px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.k{background:var(--card);border-radius:18px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;min-width:0}
+.kt{display:contents}
+.ic{width:26px;height:26px;display:grid;place-items:center;font-weight:800;font-size:14px;grid-column:1;grid-row:1}
+.ic svg{width:22px;height:22px}
+.kl{font-size:13px;color:var(--mute);grid-column:1/-1;grid-row:2;justify-self:start}
+.k b{grid-column:2;grid-row:1;font-size:clamp(16px,5vw,21px);font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+.k .bd{grid-column:1/-1;grid-row:2;justify-self:end}
+.bd{font-size:12px;font-weight:600;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.bd.ok{color:var(--ok);background:var(--okbg)}
+.bd.ruim{color:var(--bad);background:var(--badbg)}
+.card{background:var(--card);border-radius:22px;padding:16px;margin-top:12px}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.plot{display:grid;grid-template-columns:30px 1fr;gap:6px}
+.yax{display:flex;flex-direction:column;justify-content:space-between;height:150px;font-size:11px;color:#6f6f6f;text-align:right}
+.chart{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;position:relative}
+.chart::after{content:"";position:absolute;left:0;right:0;top:150px;border-top:1.5px dashed #484848;pointer-events:none}
+.col{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;background:none;border:0;padding:0;color:inherit}
+.tr{width:100%;max-width:36px;height:150px;background:#262626;border-radius:999px;display:flex;align-items:flex-end;overflow:hidden}
+.bar{width:100%;min-height:12px;border-radius:999px;background:var(--teal)}
+.col.hi .bar{background:linear-gradient(180deg,#ffb15c,#ff8a00)}
+.col.lo .bar{background:var(--coral)}
+.col .d{font-size:12px;color:var(--mute)}
+.col.hoje .d{color:var(--ink);font-weight:800}
+.col .v{font-size:11px;font-weight:700;color:var(--teal);min-height:14px;white-space:nowrap}
+.leg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:13px;color:var(--mute)}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.go{width:100%;padding:14px;border:0;border-radius:999px;background:linear-gradient(180deg,#ffa22e,#ff8a00);color:#1a0f00;font-size:17px;font-weight:800;margin-top:12px}
+.ghost{width:100%;padding:12px;border:2px solid #444;border-radius:999px;background:none;color:var(--ink);font-weight:700}
+ul{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:14px}
+li{display:flex;align-items:center;gap:12px}
+.dh{display:flex;justify-content:space-between;align-items:center;border-top:1.5px solid var(--line);padding-top:12px}
+.dh:first-child{border-top:0;padding-top:0}
+.dh span{font-weight:800}
+.nada,.empty{color:var(--mute);font-size:14px}
+.av{width:44px;height:44px;border-radius:50%;background:rgba(255,138,0,.15);color:var(--acc);display:grid;place-items:center;font-weight:700;flex:none}
+li .tx{flex:1;min-width:0}
+li strong{display:block}
+.tx small{display:block;white-space:pre-line;color:var(--mute)}
+.vl{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.vl small{font-size:12px;color:var(--mute)}
+.acts{display:flex;gap:6px}
+.del,.edt{border:0;border-radius:999px;font-size:12px;font-weight:700;padding:5px 12px}
+.del{background:var(--badbg);color:var(--bad)}
+.edt{background:rgba(123,224,208,.14);color:var(--teal)}
+.det .edt{font-size:13px;padding:7px 16px;margin:8px 0 6px}
+form{display:grid;gap:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:grid;gap:4px;font-size:14px;color:var(--mute)}
+input{font:inherit;padding:12px;border:0;border-radius:14px;background:var(--card2);color:var(--ink);width:100%;min-width:0}
+#campos{display:grid;gap:12px}
+.tipo{display:flex;gap:8px}
+.tipo button{flex:1;padding:10px;border:0;border-radius:999px;background:var(--card2);color:var(--ink);font-weight:700}
+.tipo button[aria-pressed="true"]{background:var(--acc);color:#1a0f00}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sh{width:100%;max-width:430px;background:var(--card);border-radius:28px 28px 0 0;padding:20px 16px calc(16px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;max-height:85dvh;overflow:auto}
+.sh .go{margin-top:0}
+.det{background:var(--card2);border-radius:16px;padding:6px 14px;margin-bottom:8px}
+.det div{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #353535}
+.det div:last-child{border-bottom:0}
+.det span{color:var(--mute)}
+nav{position:sticky;bottom:12px;margin:18px 14px 12px;display:flex;justify-content:space-around;align-items:center;background:#141414;border:1px solid #2a2a2a;border-radius:999px;padding:8px 14px;z-index:5;margin-top:auto}
+nav button{background:none;border:0;color:#7a7a7a;display:grid;place-items:center;width:46px;height:46px;border-radius:50%}
+nav button[aria-current="page"]{color:#fff}
+nav .plus{width:54px;height:54px;background:linear-gradient(180deg,#ffa22e,#ff7a00);color:#fff;box-shadow:0 0 22px rgba(255,138,0,.5)}
+#vHome,#vNew{padding-bottom:18px}
+</style>
+</head>
+<body>
+<main>
+<section id="vHome">
+<div class="hd">
+<span class="logo">Rotas <b>Shopee</b></span>
+<div class="road" aria-hidden="true">
+<svg class="casa" viewBox="0 0 30 30"><rect x="5" y="15" width="20" height="14" fill="#f3e3c3"/><path d="M2 16L15 3l13 13z" fill="#8a3b2a"/><rect x="12" y="19" width="6" height="10" fill="#8a5a2b"/><rect x="7" y="18" width="4" height="4" fill="#cfe8ff"/><rect x="19" y="18" width="4" height="4" fill="#cfe8ff"/></svg>
+<svg class="box" viewBox="0 0 20 18"><rect x="1" y="3" width="18" height="14" rx="1.5" fill="#c98f55" stroke="#9c6a35"/><rect x="8" y="3" width="4" height="14" fill="#e6c38d"/></svg>
+<svg class="car" viewBox="0 0 70 34"><rect x="2" y="4" width="40" height="21" rx="2" fill="#ee4d2d"/><rect x="2" y="17" width="40" height="3" fill="#fff" opacity=".35"/><path d="M44 10h10l9 9v7H44z" fill="#d8401f"/><path d="M47 12.5h6l5 6h-11z" fill="#cfe8ff"/><rect x="2" y="25" width="61" height="3" fill="#333"/><g transform="translate(14 28)"><circle r="5" fill="#222"/><g class="wh"><rect x="-.8" y="-4" width="1.6" height="8" fill="#bbb"/></g></g><g transform="translate(54 28)"><circle r="5" fill="#222"/><g class="wh"><rect x="-.8" y="-4" width="1.6" height="8" fill="#bbb"/></g></g></svg>
+</div>
+</div>
+<div class="range">
+<h1>Período</h1>
+<label class="sel"><select id="per" aria-label="Período"><option value="semana">Semana</option><option value="mes">Mês</option></select></label>
+</div>
+<p class="sub" id="sub"></p>
+
+<div class="kpis" aria-live="polite">
+<div class="k"><div class="kt"><span class="ic" style="color:#7f5fc0">R$</span><span class="bd" id="bVal" hidden></span></div><span class="kl">Valor das rotas</span><b id="sVal">R$ 0,00</b></div>
+<div class="k"><div class="kt"><span class="ic" style="color:#d89b1d"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2s6.5 6.6 6.5 11.2a6.5 6.5 0 0 1-13 0C5.5 8.6 12 2 12 2z"/></svg></span><span class="bd" id="bGas" hidden></span></div><span class="kl">Combustível</span><b id="sGas">R$ 0,00</b></div>
+<div class="k"><div class="kt"><span class="ic" style="color:var(--teal)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7zM3 7l9 4 9-4M12 11v10"/></svg></span><span class="bd" id="bPac" hidden></span></div><span class="kl">Pacotes</span><b id="sPac">0</b></div>
+<div class="k"><div class="kt"><span class="ic" style="color:#6e8f3a"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></span><span class="bd" id="bPar" hidden></span></div><span class="kl">Paradas</span><b id="sPar">0</b></div>
+</div>
+
+<section class="card">
+<div class="ch"><h2>Valor por dia (R$)</h2><span class="bd" id="bCh" hidden></span></div>
+<div class="plot"><div class="yax" id="yax"></div><div class="chart" id="chart" role="group" aria-label="Valores recebidos de segunda a domingo"></div></div>
+<div class="leg"><span><i style="background:var(--gold)"></i>Maior valor</span><span><i style="background:var(--coral)"></i>Menor valor</span><span>Toque numa barra para ver o dia</span></div>
+</section>
+
+<button class="go" type="button" id="bRotas" aria-expanded="false">Ver rotas</button>
+<section class="card" id="pRotas" hidden>
+<h2>Rotas</h2>
+<ul id="lR"></ul>
+</section>
+</section>
+
+<section id="vNew" hidden>
+<h1 id="fTit" style="margin:8px 0 14px">Nova rota do dia</h1>
+<section class="card" style="margin-top:0">
+<form id="fR">
+<div class="tipo"><button type="button" id="tRota" aria-pressed="true">Rota</button><button type="button" id="tFolga" aria-pressed="false">Folga</button></div>
+<div class="row"><label>Data<input type="date" id="rData" required></label>
+<label id="lCid">Cidade<input id="rCid" list="cidades" required autocomplete="off"></label></div>
+<datalist id="cidades"></datalist>
+<div id="campos"><div class="row"><label>Pacotes<input type="number" id="rPac" min="0" inputmode="numeric" required></label>
+<label>Paradas<input type="number" id="rPar" min="0" inputmode="numeric" required></label></div>
+<div class="row"><label>Valor da rota (R$)<input type="number" id="rVal" min="0" step="0.01" inputmode="decimal" required></label>
+<label>Combustível (R$)<input type="number" id="rGas" min="0" step="0.01" inputmode="decimal"></label></div>
+</div>
+<button class="go" type="submit" id="bSalvar" style="margin-top:0">Salvar rota do dia</button>
+<button class="ghost" type="button" id="bCancel" hidden>Cancelar edição</button>
+</form>
+</section>
+</section>
+
+<div id="sheet" class="sheet" hidden>
+<div class="sh" role="dialog" aria-modal="true" aria-labelledby="shTit">
+<h2 id="shTit"></h2><div id="shBody"></div>
+<button type="button" class="go" id="shNova">Adicionar rota neste dia</button>
+<button type="button" class="ghost" id="shX">Fechar</button>
+</div></div>
+
+<nav>
+<button type="button" id="nH" aria-label="Início" aria-current="page"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/></svg></button>
+<button type="button" class="plus" id="nN" aria-label="Nova rota"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+<button type="button" id="nR" aria-label="Ver rotas"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg></button>
+</nav>
+</main>
+
+<script>
+(function(){
+var KEY="rotas-delivery-v1",S={rotas:[]},periodo="semana",folga=false,editId=null;
+try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);S.rotas=p.rotas||[]}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function $(i){return document.getElementById(i)}
+var brl=new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
+var DS=["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"],AB=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"];
+var NOMES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+var PIN='<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>';
+function pad(n){return n<10?"0"+n:""+n}
+function iso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function dia(n){var d=new Date();d.setDate(d.getDate()+n);return iso(d)}
+function off(){return (new Date().getDay()+6)%7}
+function br(d){return d.split("-").reverse().join("/")}
+$("rData").value=dia(0);
+
+function faixa(mes,ant){
+  var t=new Date();
+  if(mes)return[iso(new Date(t.getFullYear(),t.getMonth()-(ant?1:0),1)),iso(new Date(t.getFullYear(),t.getMonth()+(ant?0:1),0))];
+  var o=off()+(ant?7:0);return[dia(-o),dia(6-o)];
+}
+function soma(f){var s={pac:0,par:0,gas:0,gan:0};S.rotas.forEach(function(r){if(r.d>=f[0]&&r.d<=f[1]){s.pac+=r.p||0;s.par+=r.s||0;s.gas+=r.f||0;s.gan+=r.v||0}});return s}
+function badge(id,cur,prev,custo){
+  var e=$(id);
+  if(!prev){e.hidden=true;return}
+  var pc=(cur-prev)/prev*100,up=pc>=0;
+  e.hidden=false;e.textContent=(up?"↗ ":"↘ ")+Math.abs(pc).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%";
+  e.className="bd "+((up!==!!custo)?"ok":"ruim");
+}
+function nice(m){if(m<=0)return 100;var p=Math.pow(10,Math.floor(Math.log10(m))),a=[1,2,2.5,5,10];for(var i=0;i<a.length;i++)if(a[i]*p>=m)return a[i]*p;return 10*p}
+
+function render(){
+  var mes=periodo==="mes",f=faixa(mes,false),c=soma(f),a=soma(faixa(mes,true));
+  $("sub").textContent=mes?"Mês de "+NOMES[new Date().getMonth()]:"Semana de "+br(f[0]).slice(0,5)+" a "+br(f[1]).slice(0,5);
+  $("sVal").textContent=brl.format(c.gan);$("sGas").textContent=brl.format(c.gas);$("sPac").textContent=c.pac;$("sPar").textContent=c.par;
+  badge("bVal",c.gan,a.gan);badge("bGas",c.gas,a.gas,true);badge("bPac",c.pac,a.pac);badge("bPar",c.par,a.par);badge("bCh",c.gan,a.gan);
+  grafico();
+  var cs=[];S.rotas.forEach(function(r){if(r.c&&cs.indexOf(r.c)<0)cs.push(r.c)});
+  $("cidades").innerHTML="";cs.forEach(function(x){var o=document.createElement("option");o.value=x;$("cidades").appendChild(o)});
+  lista(f,mes);
+}
+
+function grafico(){
+  var sd=[],mx=0,mn=1e12,mxi=-1,mni=-1,nv=0,hj=dia(0);
+  for(var k=0;k<7;k++){(function(dd){var tv=0,fl=false,tem=false;S.rotas.forEach(function(r){if(r.d===dd){if(r.folga)fl=true;else{tem=true;tv+=r.v||0}}});sd.push({d:dd,v:tv,fl:fl,tem:tem})})(dia(-off()+k))}
+  sd.forEach(function(x,i){if(x.tem&&x.v>0){nv++;if(x.v>mx){mx=x.v;mxi=i}if(x.v<mn){mn=x.v;mni=i}}});
+  var top=nice(mx),ya=$("yax");ya.innerHTML="";
+  [top,top/2,0].forEach(function(v){var s=document.createElement("span");s.textContent=v>=1000?(v/1000).toLocaleString("pt-BR")+"k":String(Math.round(v));ya.appendChild(s)});
+  var ch=$("chart");ch.innerHTML="";
+  sd.forEach(function(x,i){
+    var c=document.createElement("button"),tr=document.createElement("div"),b=document.createElement("div"),d=document.createElement("span"),v=document.createElement("span");
+    c.type="button";c.onclick=function(){abrir(x.d)};c.setAttribute("aria-label","Ver "+AB[i]+" "+br(x.d).slice(0,5));
+    c.className="col"+(nv>1&&i===mxi?" hi":"")+(nv>1&&i===mni&&mn<mx?" lo":"")+(x.d===hj?" hoje":"");
+    tr.className="tr";
+    if(x.v>0){b.className="bar";b.style.height=(x.v/top*100)+"%";tr.appendChild(b)}
+    d.className="d";d.textContent=AB[i];
+    v.className="v";v.textContent=x.fl?"Folga":x.v>0?Math.round(x.v).toLocaleString("pt-BR"):"";
+    c.appendChild(tr);c.appendChild(d);c.appendChild(v);ch.appendChild(c)});
+}
+
+function linha(r){
+  var li=document.createElement("li"),av=document.createElement("div"),tx=document.createElement("div"),s=document.createElement("strong"),sm=document.createElement("small"),vl=document.createElement("div"),v=document.createElement("b"),f=document.createElement("small"),b=document.createElement("button");
+  av.className="av";av.innerHTML=PIN;if(r.folga)av.textContent="Zz";
+  tx.className="tx";s.textContent=r.folga?"Folga":r.c;sm.textContent=r.folga?"Dia de descanso":"Pacotes: "+r.p+"\nParadas: "+r.s;tx.appendChild(s);tx.appendChild(sm);
+  vl.className="vl";v.textContent=r.folga?"":brl.format(r.v||0);f.textContent=r.f&&!r.folga?"combustível "+brl.format(r.f):"";
+  b.className="del";b.type="button";b.textContent="Excluir";b.setAttribute("aria-label","Excluir "+(r.folga?"folga":"rota de "+r.c));
+  b.onclick=function(){if(b.dataset.ok){S.rotas=S.rotas.filter(function(x){return x.id!==r.id});save();render()}else{b.dataset.ok="1";b.textContent="Confirmar exclusão";setTimeout(function(){b.dataset.ok="";b.textContent="Excluir"},4000)}};
+  var ed=document.createElement("button"),ac=document.createElement("div");ed.className="edt";ed.type="button";ed.textContent="Editar";ed.setAttribute("aria-label","Editar "+(r.folga?"folga":"rota de "+r.c));ed.onclick=function(){editar(r)};ac.className="acts";ac.appendChild(ed);ac.appendChild(b);vl.appendChild(v);vl.appendChild(f);vl.appendChild(ac);
+  li.appendChild(av);li.appendChild(tx);li.appendChild(vl);return li}
+
+function lista(f,mes){
+  var ul=$("lR");ul.innerHTML="";
+  if(!S.rotas.length){var e=document.createElement("li");e.className="empty";e.textContent="Nenhuma rota salva. Toque em Nova rota.";ul.appendChild(e);return}
+  var ds=[];
+  if(mes){S.rotas.forEach(function(r){if(r.d>=f[0]&&r.d<=f[1]&&ds.indexOf(r.d)<0)ds.push(r.d)});ds.sort().reverse();if(!ds.length){var q=document.createElement("li");q.className="nada";q.textContent="Sem rotas neste mês";ul.appendChild(q)}}
+  else for(var i=0;i<7;i++)ds.push(dia(-off()+i));
+  ds.forEach(function(d){
+    var rs=S.rotas.filter(function(r){return r.d===d}).sort(function(a,b){return a.id-b.id}),tot=0;
+    rs.forEach(function(r){tot+=r.v||0});
+    var h=document.createElement("li"),n=document.createElement("strong"),t=document.createElement("span");
+    h.className="dh";n.textContent=DS[new Date(d+"T12:00:00").getDay()]+" · "+br(d).slice(0,5);t.textContent=rs.length>1?brl.format(tot)+" no dia":"";
+    h.appendChild(n);h.appendChild(t);ul.appendChild(h);
+    if(!rs.length){var z=document.createElement("li");z.className="nada";z.textContent="Sem rota";ul.appendChild(z)}
+    rs.forEach(function(r){ul.appendChild(linha(r))})});
+}
+
+function abrir(d){
+  var rs=S.rotas.filter(function(r){return r.d===d}).sort(function(a,b){return a.id-b.id}),box=$("shBody");box.innerHTML="";
+  $("shTit").textContent=DS[new Date(d+"T12:00:00").getDay()]+" · "+br(d);
+  if(!rs.length){var p=document.createElement("p");p.textContent="Nenhuma rota registrada neste dia.";box.appendChild(p)}
+  rs.forEach(function(r){
+    var g=document.createElement("div");g.className="det";
+    var lin=r.folga?[["Situação","Folga"]]:[["Cidade",r.c],["Pacotes",r.p],["Paradas",r.s],["Valor da rota",brl.format(r.v||0)],["Combustível",brl.format(r.f||0)]];
+    lin.forEach(function(x){var l=document.createElement("div"),a=document.createElement("span"),b=document.createElement("b");a.textContent=x[0];b.textContent=x[1];l.appendChild(a);l.appendChild(b);g.appendChild(l)});
+    var eb=document.createElement("button");eb.type="button";eb.className="edt";eb.textContent="Editar";eb.onclick=function(){fecha();editar(r)};g.appendChild(eb);box.appendChild(g)});
+  $("shNova").onclick=function(){$("rData").value=d;fecha();aba("new")};
+  $("sheet").hidden=false;$("shX").focus()}
+function fecha(){$("sheet").hidden=true}
+$("shX").onclick=fecha;$("sheet").onclick=function(e){if(e.target===this)fecha()};
+document.addEventListener("keydown",function(e){if(e.key==="Escape")fecha()});
+
+$("bRotas").onclick=function(){var abrindo=$("pRotas").hidden;$("pRotas").hidden=!abrindo;this.textContent=abrindo?"Ocultar rotas":"Ver rotas";this.setAttribute("aria-expanded",abrindo)};
+$("per").onchange=function(){periodo=this.value;render()};
+
+function aba(n){var h=n==="home";if(h&&editId){editId=null;limpar()}$("vHome").hidden=!h;$("vNew").hidden=h;
+  if(h){$("nH").setAttribute("aria-current","page");$("nN").removeAttribute("aria-current")}
+  else{$("nN").setAttribute("aria-current","page");$("nH").removeAttribute("aria-current")}}
+$("nH").onclick=function(){aba("home")};$("nN").onclick=function(){aba("new")};
+
+function tipo(f){folga=f;$("tRota").setAttribute("aria-pressed",!f);$("tFolga").setAttribute("aria-pressed",f);$("lCid").hidden=f;$("campos").hidden=f;["rCid","rPac","rPar","rVal"].forEach(function(i){$(i).required=!f});$("bSalvar").textContent=editId?"Salvar alterações":f?"Salvar folga":"Salvar rota do dia";$("fTit").textContent=editId?"Editar o dia":"Nova rota do dia";$("bCancel").hidden=!editId}
+$("tRota").onclick=function(){tipo(false)};$("tFolga").onclick=function(){tipo(true)};
+function limpar(){["rCid","rPac","rPar","rGas","rVal"].forEach(function(i){$(i).value=""});$("rData").value=dia(0);tipo(false)}
+function editar(r){editId=r.id;$("rData").value=r.d;if(r.folga){tipo(true)}else{tipo(false);$("rCid").value=r.c;$("rPac").value=r.p;$("rPar").value=r.s;$("rVal").value=r.v||"";$("rGas").value=r.f||""}aba("new");window.scrollTo(0,0)}
+$("bCancel").onclick=function(){aba("home")};
+$("nR").onclick=function(){aba("home");$("pRotas").hidden=false;$("bRotas").textContent="Ocultar rotas";$("bRotas").setAttribute("aria-expanded",true);$("pRotas").scrollIntoView({behavior:"smooth",block:"start"})};
+$("fR").onsubmit=function(e){e.preventDefault();
+  var o=folga?{id:editId||Date.now(),d:$("rData").value,c:"",p:0,s:0,f:0,v:0,folga:true}:{id:editId||Date.now(),d:$("rData").value,c:$("rCid").value.trim(),p:+$("rPac").value,s:+$("rPar").value,f:+$("rGas").value||0,v:+$("rVal").value||0};
+  if(editId){S.rotas=S.rotas.map(function(x){return x.id===editId?o:x})}else{S.rotas.push(o)}
+  editId=null;save();limpar();render();aba("home")};
+render();
+})();
+</script>
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+</script>
+</body>
+</html>
